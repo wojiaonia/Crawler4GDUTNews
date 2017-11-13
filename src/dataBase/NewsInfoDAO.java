@@ -6,32 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-/**
+/*
  * DAO层 主要负责增删改查
  *
  * */
 public class NewsInfoDAO {
-    //just for test
-    /**
-    public static void main(String args[]) {
-        NewsInfo info = new NewsInfo();
 
-        try {
-            info = new NewsInfoDAO().get();
-            System.out.println(info);
-            info.setHref("1");
-            info.setDepartment("1");
-            info.setTime(LocalDateTime.now());
-            info.setTitle("1");
-            info.setCount(1);
-            new NewsInfoDAO().updateInfo(info);
-            info = new NewsInfoDAO().get();
-            System.out.println(info);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    */
     //增
     public void addInfo(NewsInfo info) throws SQLException {
         //获取数据库连接
