@@ -229,7 +229,7 @@ public class HtmlUnitDriver {
          * */
         newsInfo = new NewsInfoDAO().get();
         String lastHref = newsInfo.getHref();
-        if (!lastHref.equals(latestUrl)) {
+        if (!(lastHref.equals(latestUrl))) {
             //if equals skip the following pocedure
 
             //跳转到地址
