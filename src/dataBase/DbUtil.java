@@ -5,11 +5,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DbUtil {
-    //预先创建 forCrawl dataBase  添加了 ssl false 由于使用了最新的 mysql(mysql 5.5.45 后的版本)否则一直 warning 很烦
-    public static final String URL = "jdbc:mysql://localhost:3306/forcrawl?useSSL=false";
-    public static final String USER = "root";
-    public static final String PASSWORD = "Wobu4pjq,";
+    /**
+     * 预先创建 forCrawl dataBase  添加了 ssl false 由于使用了最新的 mysql(mysql 5.5.45 后的版本)否则一直 warning 很烦
+     */
+    private static final String URL = "jdbc:mysql://localhost:3306/forcrawl?useSSL=false";
+    private static final String USER = "root";
+    private static final String PASSWORD = "Wobu4pjq,";
+
     //public static final String PASSWORD = "12345678";
+
     private static Connection conn = null;
     static{
         try {
@@ -21,7 +25,8 @@ public class DbUtil {
             e.printStackTrace();
         }
     }
-    //静态封装 connection
+
+    /**静态封装 connection*/
     public static Connection getConnection(){
         return conn;
     }

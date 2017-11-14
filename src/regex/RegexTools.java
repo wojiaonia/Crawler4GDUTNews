@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.lang.Integer.*;
+import static java.lang.Integer.parseInt;
 
 /**
  * 只是返回字符串,还需要后续的转换成对象 如 LocalDateTime
@@ -15,7 +15,8 @@ public class RegexTools {
     private String timeFormatter;
     private ArrayList<String> timeComponent;
     public RegexTools(){
-        /**
+
+        /*
          * arraylist 一定要初始化哦  要不会空指针呢
          * */
         regexResults = new ArrayList<>();
@@ -28,17 +29,18 @@ public class RegexTools {
      *
      * */
     public ArrayList<String> doRegex(String targetStr, String patternStr) {
+
         //we use Regex to find our the targetStr we want
         //case_insensitive and dotall mode
         Pattern pattern = Pattern.compile(patternStr,Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-        //Pattern pattern = Pattern.compile(patternStr);
+
         //matcher str
         Matcher matcher = pattern.matcher(targetStr);
 
         //注意 就是 这个 ArrayList 并不是用来保存同一种信息,只是拿来保存可能存在的多个 group 而已
         //group(0) 为整个匹配字符串哦 我们不使用的
         boolean isFind = matcher.find();
-        //System.out.println("group count is " + matcher.groupCount());
+
         if (isFind) {
             for (int i = 1; i <= matcher.groupCount(); i++) {
                 regexResults.add(matcher.group(i));

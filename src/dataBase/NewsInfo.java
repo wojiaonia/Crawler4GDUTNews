@@ -48,7 +48,10 @@ public class NewsInfo {
     public int getCount(){ return readCount;
     }
 
-    //这个只是测试用，以后可以修改 一共有六个变量，现在只输出三个我最关注的
+    /**
+     * 这个只是测试用，以后可以修改 一共有六个变量，现在只输出三个我最关注的
+     */
+    @Override
     public String toString(){
         return " time: " + newstime + ",title: " + title +",address: " + href + " ,dep: " + department + " ,count: " + readCount + "" + "\n";
 

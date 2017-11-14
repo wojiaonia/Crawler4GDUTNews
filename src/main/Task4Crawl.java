@@ -22,7 +22,9 @@ public class Task4Crawl implements Runnable {
     String urlLogin = "http://news.gdut.edu.cn/UserLogin.aspx";
     String urlTarget = "http://news.gdut.edu.cn/ArticleList.aspx?keyword=%E7%9B%91%E8%80%83&category=5&department=2147483647&start=&end=";
 
-    //传入 cm 单例
+    /**
+     * 传入 cm 单例
+     */
     Task4Crawl(CookieManager cm){
         this.cm = cm;
     }

@@ -11,60 +11,47 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
+/**
+ * Driver class
+ *
+ * @author wojiaotommy
+ * @date 2017/11/14
+ */
+
 public class HtmlUnitDriver {
 
-    //params
-    private String urlLogin;
     private String urlTarget;
-    private String username;
-    private String password;
-    private String resultAll;
-    //最新发布的新闻的访问地址
+    /**
+     * timeout
+     */
+    private static long WAIT_PAGE_REFRESH = 2000L;
+    /**
+     * 最新发布的新闻的访问地址
+     */
     private String latestUrl;
-    //正则 pattern ,  第一个用于找出最新的地址,  剩余三个用于找出 specific 新闻里的关键信息
-    private String patternStr;
+
     private String titlePattern;
     private String departmentPattern ;
     private String timePattern ;
     private String countPattern;
-
-    //整个新闻页面的 sourceCode
-    private String latestResult;
-    //四个需要爬出出来的信息
-    private String title;
+    /**
+     * 正则 pattern ,  第一个用于找出最新的地址,  剩余三个用于找出 specific 新闻里的关键信息
+     */
+    private String patternStr;
     private String department;
     private String timeStr;
     private LocalDateTime newstime;
     private String readCount;
-    //newsinfo object
+    /**
+     * 四个需要爬出出来的信息
+     */
+    private String title;
+    /**newsinfo object*/
     private NewsInfo newsInfo;
-
-    //timeout
-    private static long WAIT_PAGE_REFRESH = 2000L;
-
-    //single client
+    /**single client*/
     private WebClient webClient;
 
 
-
-    //留着以后用 现在只爬监考网
-    /*
-    HtmlUnitDriver(String urlLogin , String urlTarget){
-
-        newsInfo = new NewsInfo();
-        this.urlLogin = urlLogin;
-        this.urlTarget = urlTarget;
-        //default login params
-        this.username = "gdutnews";
-        this.password = "newsgdut";
-        //---
-        patternStr = "<div.id=\"ContentPlaceHolder1_ListView1_ItemPlaceHolderContainer\">.+?<p>.+?<a.href=\"(.+?)\"";
-        titlePattern = "<center>\\s*<span.style=.*?>\\s*(.+?)\\s*</span>";
-        departmentPattern = "\\[所属部门:(.+?)\\]";
-        timePattern = "\\[发布日期:(.+?)\\]";
-        countPattern = "\\[阅读次数:(\\d+)\\]";
-    }
-*/
     public HtmlUnitDriver() {
 
         {
@@ -95,14 +82,13 @@ public class HtmlUnitDriver {
         }
 
 
-
-
         newsInfo = new NewsInfo();
-        this.urlLogin = "http://news.gdut.edu.cn/UserLogin.aspx";
+        /*params*/
+        String urlLogin = "http://news.gdut.edu.cn/UserLogin.aspx";
         this.urlTarget = "http://news.gdut.edu.cn/ArticleList.aspx?keyword=%E7%9B%91%E8%80%83&category=5&department=2147483647&start=&end=";
         //default login params
-        this.username = "gdutnews";
-        this.password = "newsgdut";
+        String username = "gdutnews";
+        String password = "newsgdut";
         //---
         patternStr = "<div.id=\"ContentPlaceHolder1_ListView1_ItemPlaceHolderContainer\">.+?<p>.+?<a.href=\"(.+?)\"";
         /*
@@ -117,9 +103,9 @@ public class HtmlUnitDriver {
     }
 
 
-
-
-    //get title
+    /**
+     * get title
+     **/
     private String getTitle(String content){
         String pStr = "<title>.+?(广东工业大学新闻通知网).+?</title>";
 
@@ -127,13 +113,6 @@ public class HtmlUnitDriver {
     }
 
 
-    /*
-    public static  void main(String args[]) throws IOException {
-        NewsInfo test = new HtmlUnitDriver().getLatestInfo();
-
-        System.out.println(test);
-    }
-    */
     public NewsInfo getLatestInfo(CookieManager cm) throws IOException, InterruptedException, SQLException {
 
 
@@ -147,7 +126,6 @@ public class HtmlUnitDriver {
         //所以 还能保存到上一次获取的 cookies 若未过期 set 上去就可以直接访问 target 页面啦
         //无需在浪费资源访问 , 登录页面
         webClient.setCookieManager(cm);
-
 
 
         //尝试访问 目标页面 ,如果还没登录 无 cookie 服务器会重定向到 login page
@@ -202,10 +180,10 @@ public class HtmlUnitDriver {
             System.out.println("login finish");
 
 
-                //set cookies with the existing cookies
+            //set cookies with the existing cookies
             //我不知道可不可以这样理解 就是 cookiemanager 是记录管理传输的 cookie 的, 若要使用
             //需要先 set 进去, 这样实现了 cookie 与 request 独立
-                webClient.setCookieManager(cm);
+            webClient.setCookieManager(cm);
 
 
         }//至此  登录完毕
@@ -214,7 +192,7 @@ public class HtmlUnitDriver {
         HtmlPage pageTarget = webClient.getPage(urlTarget);
         System.out.println("sucessfully get the target page content! now regex out latest url ");
         //获取 target 网页的内容
-        resultAll = pageTarget.asXml();
+        String resultAll = pageTarget.asXml();
         //regex 出最新发布的新闻的地址 , 记得加 gdut 前缀 ,同时去掉 那个 . 通过 substring
         latestUrl = "http://news.gdut.edu.cn" + new RegexTools().doRegex(resultAll, patternStr).get(0).substring(1);
 
@@ -229,6 +207,7 @@ public class HtmlUnitDriver {
          * */
         newsInfo = new NewsInfoDAO().get();
         String lastHref = newsInfo.getHref();
+
         if (!(lastHref.equals(latestUrl))) {
             //if equals skip the following pocedure
 
@@ -242,7 +221,8 @@ public class HtmlUnitDriver {
              * */
             HtmlPage lastestPage = webClient.getPage(latestUrl);
             //获取最新发布的信息网页内容
-            latestResult = lastestPage.asXml();
+            /*整个新闻页面的 sourceCode*/
+            String latestResult = lastestPage.asXml();
 
             //获取完毕 关闭 client
             webClient.close();
@@ -269,7 +249,6 @@ public class HtmlUnitDriver {
         //return last info
         return newsInfo;
     }
-
 
 
 }

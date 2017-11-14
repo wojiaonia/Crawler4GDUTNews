@@ -6,13 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-/*
+/**
  * DAO层 主要负责增删改查
  *
  * */
 public class NewsInfoDAO {
 
-    //增
+
     public void addInfo(NewsInfo info) throws SQLException {
         //获取数据库连接
         Connection conn = DbUtil.getConnection();
@@ -36,13 +36,15 @@ public class NewsInfoDAO {
         ptmt.execute();
     }
 
-    //更新数据
+    /**
+     * 更新数据
+     */
     public void updateInfo(NewsInfo info) throws SQLException {
         //获取数据库连接
         Connection conn = DbUtil.getConnection();
-        //sql  切记 千万别漏了 空格
 
-        String sql = "UPDATE forcrawl_newsinfo " +  //newsinfo 后加个空格哦
+        //sql  切记 千万别漏了 空格,newsinfo 后加个空格哦
+        String sql = "UPDATE forcrawl_newsinfo " +
                 "SET href=?, title=? , department=? , newstime=? , readcount=?" +
                 " WHERE id =?";
 
@@ -66,7 +68,7 @@ public class NewsInfoDAO {
 
     }
 
-    //获取数据
+    /**获取数据*/
     public NewsInfo get() throws SQLException{
         NewsInfo info = null;
         //获取连接
@@ -86,8 +88,8 @@ public class NewsInfoDAO {
             info.setHref(rs.getString("href"));
             info.setTitle(rs.getString("title"));
             info.setDepartment(rs.getString("department"));
+
             //就是这么刚  强势 cast 咬我?
-            //info.setTime(LocalDateTime.parse(rs.getString("newstime")));
             info.setTime(LocalDateTime.parse(rs.getString("newstime")));
             info.setCount(rs.getInt("readcount"));
         }
