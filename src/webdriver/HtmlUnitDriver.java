@@ -12,8 +12,8 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 public class HtmlUnitDriver {
+
     //params
-    private static WebClient webClient;
     private String urlLogin;
     private String urlTarget;
     private String username;
@@ -42,6 +42,9 @@ public class HtmlUnitDriver {
     //timeout
     private static long WAIT_PAGE_REFRESH = 2000L;
 
+    //single client
+    private WebClient webClient;
+
 
 
     //留着以后用 现在只爬监考网
@@ -64,6 +67,36 @@ public class HtmlUnitDriver {
 */
     public HtmlUnitDriver() {
 
+        {
+            //constructor
+            webClient = new WebClient();
+
+            //经过测试  关闭 css 和 关闭 javascript 的加载可以减少错误
+            //另外 我访问的网页全都是 静态网页
+            //静态推荐两个都关闭
+            //关闭 css
+            webClient.getOptions().setCssEnabled(false);
+            //关闭 js 支持
+            webClient.getOptions().setJavaScriptEnabled(false);
+            //由于如果 response 的 status code 不是 200 如302跳转等  就会抛出failing status code 的错误 这里关闭这个错误的抛出 忽略
+            webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
+            //允许重定向
+            webClient.getOptions().setRedirectEnabled(true);
+            //cookie support
+            webClient.getCookieManager().setCookiesEnabled(true);
+            //设置 timeout 时间 避免因为 网络突然缓慢导出 的 java.net.SocketTimeoutException: Read timed out under tomcat
+            webClient.getOptions().setTimeout(120000);
+
+            //由于长时间重复执行后  会报 “FailingHttpStatusCodeException: Too much redirect for”  的错误
+            //原因已查实 是因为 htmlunit 会默认 把response cache 起来(相当于历史记录 可以实现回退和跳转),过多的 cache 会占据资源空间 因此报错误提醒
+            //解决办法 . 把 cache 功能关闭
+            webClient.getCache().setMaxSize(0);
+
+        }
+
+
+
+
         newsInfo = new NewsInfo();
         this.urlLogin = "http://news.gdut.edu.cn/UserLogin.aspx";
         this.urlTarget = "http://news.gdut.edu.cn/ArticleList.aspx?keyword=%E7%9B%91%E8%80%83&category=5&department=2147483647&start=&end=";
@@ -84,19 +117,13 @@ public class HtmlUnitDriver {
     }
 
 
-    private  WebClient getClient(){
-        //一个 driver
-        webClient = new WebClient();
-        return webClient;
-    }
+
 
     //get title
     private String getTitle(String content){
         String pStr = "<title>.+?(广东工业大学新闻通知网).+?</title>";
 
-        String title = new RegexTools().doRegex(content,pStr).get(0);
-
-        return title;
+        return new RegexTools().doRegex(content, pStr).get(0);
     }
 
 
@@ -109,27 +136,6 @@ public class HtmlUnitDriver {
     */
     public NewsInfo getLatestInfo(CookieManager cm) throws IOException, InterruptedException, SQLException {
 
-        //single client
-        WebClient webClient = new WebClient();
-
-        /*
-         * 经过测试  关闭 css 和 关闭 javascript 的加载可以减少错误
-         * 另外 我访问的网页全都是 静态网页
-         * 静态推荐两个都关闭
-         * */
-
-        //关闭 css
-        webClient.getOptions().setCssEnabled(false);
-        //关闭 js 支持
-        webClient.getOptions().setJavaScriptEnabled(false);
-        //由于如果 response 的 status code 不是 200 如302跳转等  就会抛出failing status code 的错误 这里关闭这个错误的抛出 忽略
-        webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
-        //允许重定向
-        webClient.getOptions().setRedirectEnabled(true);
-        //cookie support
-        webClient.getCookieManager().setCookiesEnabled(true);
-        //设置 timeout 时间 避免因为 网络突然缓慢导出 的 java.net.SocketTimeoutException: Read timed out under tomcat
-        webClient.getOptions().setTimeout(120000);
 
         //设置 webclient 的 timeout 时间( milliseconds)
         /*
@@ -223,7 +229,8 @@ public class HtmlUnitDriver {
          * */
         newsInfo = new NewsInfoDAO().get();
         String lastHref = newsInfo.getHref();
-        if (lastHref != latestUrl) {//if equals skip the following pocedure
+        if (!lastHref.equals(latestUrl)) {
+            //if equals skip the following pocedure
 
             //跳转到地址
             /*
