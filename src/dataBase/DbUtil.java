@@ -4,18 +4,25 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DbUtil {
+class DbUtil {
     /**
      * 预先创建 forCrawl dataBase  添加了 ssl false 由于使用了最新的 mysql(mysql 5.5.45 后的版本)否则一直 warning 很烦
      */
-    private static final String URL = "jdbc:mysql://localhost:3306/forcrawl?useSSL=false";
+    private static final String URL = "jdbc:mysql://localhost:3306/forcrawl?useSSL=false&autoReconnect=true";
     private static final String USER = "root";
     private static final String PASSWORD = "Wobu4pjq,";
 
     //public static final String PASSWORD = "12345678";
 
-    private static Connection conn = null;
-    static{
+    private  Connection conn = null;
+
+
+
+
+    /**静态封装 connection*/
+    Connection getConnection(){
+
+
         try {
             //1.加载驱动程序
             Class.forName("com.mysql.jdbc.Driver");
@@ -24,10 +31,7 @@ public class DbUtil {
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
-    }
 
-    /**静态封装 connection*/
-    public static Connection getConnection(){
         return conn;
     }
 }
